@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useAuth } from "../AuthContext";
-import Navbar from "../components/Navbar";
+import { useAuth } from "../AuthContext.jsx";
+import Navbar from "../components/Navbar.jsx";
 
 const CrushForm = () => {
   const [crushes, setCrushes] = useState([""]);

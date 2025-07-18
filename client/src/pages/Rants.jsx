@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useLocation } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import { useAuth } from '../AuthContext';
+import Navbar from '../components/Navbar.jsx';
+import { useAuth } from '../AuthContext.jsx';
 
 const RantPage = () => {
   const [rants, setRants] = useState([]);
