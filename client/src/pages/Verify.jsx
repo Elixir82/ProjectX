@@ -19,7 +19,7 @@ function OTPVerify() {
     setMessage('');
     
     try {
-      const res = await axios.post('http://localhost:8000/verify', {
+      const res = await axios.post('https://projectx-vbmj.onrender.com/verify', {
         email,
         otp,
         crushData

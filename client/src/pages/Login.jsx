@@ -35,7 +35,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const resp = await axios.post('http://localhost:8000/signup', { email });
+      const resp = await axios.post('https://projectx-vbmj.onrender.com/signup', { email });
       if (resp?.data?.message) {
         setRes(resp.data.message);
         localStorage.setItem('campusCupidEmail', email);

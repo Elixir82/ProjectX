@@ -19,7 +19,7 @@ const ConfessPage = () => {
 
   const fetchConfessions = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/confess');
+      const response = await axios.get('https://projectx-vbmj.onrender.com/confess');
       setConfessions(response.data.confessions);
     } catch (error) {
       console.error('Error fetching confessions:', error);
@@ -35,7 +35,7 @@ const ConfessPage = () => {
     setLoading(true);
     setMessage('');
     try {
-      const response = await axios.post('http://localhost:8000/confess', {
+      const response = await axios.post('https://projectx-vbmj.onrender.com/confess', {
         confession: newConfession
       });
       setMessage(response.data.message);

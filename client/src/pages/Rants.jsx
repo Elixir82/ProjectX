@@ -19,7 +19,7 @@ const RantPage = () => {
 
   const fetchRants = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/rant');
+      const response = await axios.get('https://projectx-vbmj.onrender.com/rant');
       setRants(response.data.rants);
     } catch (error) {
       console.error('Error fetching rants:', error);
@@ -35,7 +35,7 @@ const RantPage = () => {
     setLoading(true);
     setMessage('');
     try {
-      const response = await axios.post('http://localhost:8000/rant', {
+      const response = await axios.post('https://projectx-vbmj.onrender.com/rant', {
         rant: newRant
       });
       setMessage(response.data.message);

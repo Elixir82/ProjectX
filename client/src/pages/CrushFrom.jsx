@@ -16,7 +16,7 @@ const CrushForm = () => {
         const token = localStorage.getItem("token");
         try {
           const res = await axios.get(
-            `http://localhost:8000/match/count/${user.regNo}`,
+            `https://projectx-vbmj.onrender.com/match/count/${user.regNo}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           setCrushCount(res.data.count);
@@ -33,7 +33,7 @@ const CrushForm = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
       try {
-        const res = await axios.get("http://localhost:8000/match/my-matches", {
+        const res = await axios.get("https://projectx-vbmj.onrender.com/match/my-matches", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setMyMatches(res.data.matchedWith);
@@ -75,7 +75,7 @@ const CrushForm = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:8000/match",
+        "https://projectx-vbmj.onrender.com/match",
         { crushes: filteredCrushes, user },
         { headers: { Authorization: `Bearer ${token}` } }
       );

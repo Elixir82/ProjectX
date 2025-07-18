@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await axios.get('http://localhost:8000/verify-token', {
+      const response = await axios.get('https://projectx-vbmj.onrender.com/verify-token', {
         headers: {
           Authorization: `Bearer ${token}`
         }
