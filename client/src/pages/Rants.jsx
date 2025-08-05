@@ -9,6 +9,7 @@ const RantPage = () => {
   const [newRant, setNewRant] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  // const [forRealCount, setForRealCount] = useState(0);
   const location = useLocation();
   const { isAuthenticated } = useAuth();
 
@@ -16,6 +17,23 @@ const RantPage = () => {
     fetchRants();
     // eslint-disable-next-line
   }, []);
+
+  const ForRealClick = async (rantID) => {
+    try {
+      const response = await axios.get(`https://projectx-vbmj.onrender.com/rant/${rantID}`);
+      if (response) {
+        setRants((prev) =>
+          prev.map((rant) =>
+            rant._id === rantID
+              ? { ...rant, forRealCount: response.data.count }
+              : rant
+          )
+        );
+      }
+    } catch (error) {
+      console.log("Error while updating for real count",error);
+    }
+  };
 
   const fetchRants = async () => {
     try {
@@ -55,7 +73,7 @@ const RantPage = () => {
 
       {!isAuthenticated && (
         <div className="max-w-xl mx-auto mt-8 mb-6 px-6 py-5 bg-gradient-to-r from-yellow-100 to-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow flex items-start gap-4">
-          <svg width={32} height={32} className="text-yellow-400 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 24 24"><path d="M13 13h-2v-2h2m0-2h-2v-2h2M12 17a1.5 1.5 0 0 1-1.5-1.5H11V17h1v-1.5A1.5 1.5 0 0 1 12 17Zm0-14c-5.04 0-9.13 4.09-9.13 9.13 0 3.57 2.13 6.63 5.25 8.21v.38a3.75 3.75 0 1 0 7.5 0v-.38c3.12-1.58 5.25-4.64 5.25-8.21C21.13 7.09 17.04 3 12 3Zm0 16a1.75 1.75 0 0 1-1.75-1.75h3.5A1.75 1.75 0 0 1 12 19Zm4.5-5.42c-.52.18-1.08.28-1.66.28s-1.14-.1-1.66-.28a.5.5 0 0 0-.68.44v.75A8.3 8.3 0 0 1 7.08 12c0-.28.22-.5.5-.5h1.07c.38 0 .68.29.74.65.22 1.34 1.39 2.35 2.73 2.35s2.51-1.01 2.73-2.35c.06-.36.36-.65.74-.65h1.07a.5.5 0 0 1 .5.5c0 1.28-.27 2.51-.75 3.58v-.75a.5.5 0 0 0-.68-.44Z"/></svg>
+          <svg width={32} height={32} className="text-yellow-400 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 24 24"><path d="M13 13h-2v-2h2m0-2h-2v-2h2M12 17a1.5 1.5 0 0 1-1.5-1.5H11V17h1v-1.5A1.5 1.5 0 0 1 12 17Zm0-14c-5.04 0-9.13 4.09-9.13 9.13 0 3.57 2.13 6.63 5.25 8.21v.38a3.75 3.75 0 1 0 7.5 0v-.38c3.12-1.58 5.25-4.64 5.25-8.21C21.13 7.09 17.04 3 12 3Zm0 16a1.75 1.75 0 0 1-1.75-1.75h3.5A1.75 1.75 0 0 1 12 19Zm4.5-5.42c-.52.18-1.08.28-1.66.28s-1.14-.1-1.66-.28a.5.5 0 0 0-.68.44v.75A8.3 8.3 0 0 1 7.08 12c0-.28.22-.5.5-.5h1.07c.38 0 .68.29.74.65.22 1.34 1.39 2.35 2.73 2.35s2.51-1.01 2.73-2.35c.06-.36.36-.65.74-.65h1.07a.5.5 0 0 1 .5.5c0 1.28-.27 2.51-.75 3.58v-.75a.5.5 0 0 0-.68-.44Z" /></svg>
           <div>
             <span className="font-semibold text-yellow-800 block">
               To use the <span className="text-pink-700 font-bold">Find Crush</span> page, verify yourself with your VITAP email, no password required<br />
@@ -120,11 +138,11 @@ const RantPage = () => {
           {message && (
             <div className={`mt-4 text-center rounded-lg py-2 px-3 font-medium transition-all
                 ${message.includes('Error')
-                  ? 'bg-red-100 text-red-700'
-                  : message.includes('please write')
+                ? 'bg-red-100 text-red-700'
+                : message.includes('please write')
                   ? 'bg-amber-100 text-amber-700'
                   : 'bg-green-100 text-green-700'
-                }`
+              }`
             }>
               {message}
             </div>
@@ -156,6 +174,29 @@ const RantPage = () => {
                       Anonymous
                     </span>
                     <span>{new Date(rant.createdAt).toLocaleString()}</span>
+                  </div>
+                  
+                  {/* Updated "For Real" Button */}
+                  <div className="mt-4 flex justify-end">
+                    <button 
+                      onClick={() => ForRealClick(rant._id)}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white text-sm font-semibold rounded-full shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
+                    >
+                      <svg 
+                        width={16} 
+                        height={16} 
+                        fill="currentColor" 
+                        viewBox="0 0 16 16"
+                        className="text-white"
+                      >
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/>
+                      </svg>
+                      For Real
+                      <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-bold">
+                        {rant.forRealCount}
+                      </span>
+                    </button>
                   </div>
                 </div>
               ))}

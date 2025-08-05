@@ -19,6 +19,7 @@ const ConfessPage = () => {
 
   const fetchConfessions = async () => {
     try {
+      console.log("Let's see if theis is working");
       const response = await axios.get('https://projectx-vbmj.onrender.com/confess');
       setConfessions(response.data.confessions);
     } catch (error) {
