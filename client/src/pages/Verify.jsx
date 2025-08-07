@@ -46,7 +46,7 @@ function OTPVerify() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-rose-50">
         <div className="bg-white px-8 py-6 rounded-2xl shadow-xl text-center">
-          <p className="text-red-600 font-semibold text-lg">No email found.<br />Please login again.</p>
+          <p className="text-red-600 font-semibold text-lg">Email is being retrieved<br /> Please  wait for sometime...if nothing happens, login again.</p>
           <button
             onClick={() => navigate('/login')}
             className="mt-5 px-6 py-2 rounded-full bg-pink-600 text-white font-semibold transition shadow hover:bg-rose-600"

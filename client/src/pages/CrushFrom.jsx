@@ -4,204 +4,287 @@ import { useAuth } from "../AuthContext.jsx";
 import Navbar from "../components/Navbar.jsx";
 
 const CrushForm = () => {
-  const [crushes, setCrushes] = useState([""]);
+  const [crushRegNo, setCrushRegNo] = useState("");
+  const [crushName, setCrushName] = useState("");
   const [message, setMessage] = useState("");
   const { user } = useAuth();
   const [crushCount, setCrushCount] = useState(0);
   const [myMatches, setMyMatches] = useState([]);
+  const [myCrushes, setMyCrushes] = useState([]);
 
+  // Fetch initial data
   useEffect(() => {
-    const fetchCrushCount = async () => {
-      if (user?.regNo) {
-        const token = localStorage.getItem("token");
-        try {
-          const res = await axios.get(
-            `https://projectx-vbmj.onrender.com/match/count/${user.regNo}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          setCrushCount(res.data.count);
-        } catch {
-          setCrushCount(0);
-        }
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token || !user?.regNo) return;
+      
+      try {
+        // Fetch crush count
+        const countRes = await axios.get(
+          `https://projectx-vbmj.onrender.com/match/count/${user.regNo}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setCrushCount(countRes.data.count);
+
+        // Fetch matches
+        const matchesRes = await axios.get(
+          "https://projectx-vbmj.onrender.com/match/my-matches",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setMyMatches(matchesRes.data.matchedWith);
+
+        // Fetch user's crushes 
+        const crushesRes = await axios.get(
+          "https://projectx-vbmj.onrender.com/match/crushes",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setMyCrushes(crushesRes.data.crushes);
+
+      } catch (error) {
+        console.error("Fetch error:", error);
       }
     };
-    fetchCrushCount();
+    fetchData();
   }, [user?.regNo]);
 
-  useEffect(() => {
-    const fetchMyMatches = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      try {
-        const res = await axios.get("https://projectx-vbmj.onrender.com/match/my-matches", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setMyMatches(res.data.matchedWith);
-      } catch {
-        setMyMatches([]);
-      }
-    };
-    fetchMyMatches();
-  }, []);
-
-  const handleChange = (index, value) => {
-    const updated = [...crushes];
-    updated[index] = value;
-    setCrushes(updated);
-  };
-
-  const addField = () => {
-    if (crushes.length < 5) setCrushes([...crushes, ""]);
-  };
-
-  const removeField = (index) => {
-    if (crushes.length > 1) {
-      const updated = crushes.filter((_, i) => i !== index);
-      setCrushes(updated);
-    }
-  };
-
-  const handleSubmit = async (e) => {
+  const handleAddCrush = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-    if (!token) return alert("You must be logged in.");
+    if (!token) return alert("Please login first");
 
-    const filteredCrushes = crushes.filter((crush) => crush.trim() !== "");
-
-    if (filteredCrushes.length === 0) {
-      setMessage("Please enter at least one crush registration number.");
+    if (!crushRegNo.trim()) {
+      setMessage("Please enter a registration number");
       return;
     }
 
     try {
       const res = await axios.post(
         "https://projectx-vbmj.onrender.com/match",
-        { crushes: filteredCrushes, user },
+        { crushRegNo, crushName },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setMessage(res.data.message);
 
-      if (res.data.newMatches && res.data.newMatches.length > 0) {
-        setMessage(
-          `🎉 You have ${res.data.newMatches.length} new match(es)! Registration numbers: ${res.data.newMatches.join(
-            ", "
-          )}`
-        );
+      if (res.data.isMatch) {
+        setMessage(`🎉 It's a match with ${crushRegNo}!`);
+        setMyMatches(prev => [...prev, crushRegNo]);
+      } else {
+        setMessage(`Added ${crushName || crushRegNo} to your crushes`);
+        setMyCrushes(prev => [...prev, { regNo: crushRegNo, name: crushName }]);
       }
-    } catch (err) {
-      console.error("Match error:", err.message);
-      setMessage("Something went wrong");
+
+      // Clear form
+      setCrushRegNo("");
+      setCrushName("");
+
+    } catch (error) {
+      setMessage(error.response?.data?.error || "Failed to add crush");
+    }
+  };
+
+  const handleDeleteCrush = async (regNo) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      await axios.delete(
+        `https://projectx-vbmj.onrender.com/match/${regNo}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMyCrushes(prev => prev.filter(c => c.regNo !== regNo));
+      setMessage(`Removed crush ${regNo}`);
+    } catch (error) {
+      setMessage("Failed to delete crush");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-pink-100 to-pink-200 font-inter">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-red-50 font-inter">
       <Navbar />
 
-      <div className="max-w-2xl mx-auto px-2 sm:px-4 md:px-8 py-6 md:py-10">
-        <div className="bg-white shadow-2xl border border-pink-100 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 flex flex-col gap-6 sm:gap-8 mt-4 sm:mt-8 backdrop-blur-md">
+      <div className="max-w-4xl mx-auto px-4 py-10">
+        {/* Header Section */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center shadow-lg">
+              <svg width={24} height={24} fill="white" viewBox="0 0 16 16">
+                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748z"/>
+              </svg>
+            </div>
+            <h1 className="text-4xl font-extrabold bg-gradient-to-r from-pink-600 via-rose-600 to-red-600 bg-clip-text text-transparent">
+              Find Your Crush
+            </h1>
+          </div>
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            Connect with your secret crushes and discover mutual connections
+          </p>
+        </div>
 
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-pink-600 tracking-tight text-center drop-shadow">
-            Find Your Campus Crush <span className="inline-block animate-pulse">💕</span>
-          </h2>
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Left Column - Stats & Matches */}
+          <div className="space-y-6">
+            {/* Crush Count Card */}
+            <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl p-6 border border-pink-100">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <span className="text-2xl font-bold text-white">{crushCount}</span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">Secret Admirers</h3>
+                <p className="text-gray-600">
+                  <span className="font-semibold text-pink-600">{crushCount}</span> people have you as their crush
+                </p>
+              </div>
+            </div>
 
-          <div className="mb-2 sm:mb-4 p-3 sm:p-4 bg-gradient-to-r from-pink-100 to-pink-50 rounded-xl sm:rounded-2xl shadow-sm border border-pink-200">
-            <p className="text-sm sm:text-md text-pink-700 leading-relaxed text-center">
-              <strong>How it works:</strong> Enter your crush's registration numbers below.
-              If they've also added you, you'll <span className="bg-green-100 px-2 py-1 rounded">get a match notification</span>!
-            </p>
-            {user?.regNo && (
-              <div className="mt-2 sm:mt-4 text-center text-pink-800 font-semibold">
-                <span className="inline-flex items-center gap-1">
-                  <span className="text-lg sm:text-xl">{crushCount}</span>
-                  {crushCount === 1 ? "person has" : "people have"} added you as a crush 💌
-                </span>
+            {/* Current Matches */}
+            {myMatches.length > 0 && (
+              <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl p-6 border border-green-100">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                    <svg width={16} height={16} fill="white" viewBox="0 0 16 16">
+                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-green-700">🎉 Your Matches</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {myMatches.map(regNo => (
+                    <div key={regNo} className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 px-4 py-3 rounded-xl shadow-sm text-center">
+                      <span className="font-semibold text-green-800">{regNo}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
-          {myMatches && myMatches.length > 0 && (
-            <div className="mb-2 sm:mb-4 p-3 sm:p-4 bg-lime-100 shadow rounded-xl sm:rounded-2xl text-green-800 font-medium flex flex-col items-center gap-1 sm:gap-2">
-              <span className="text-base sm:text-lg font-semibold">💚 You're matched!</span>
-              <span className="flex flex-wrap gap-1 sm:gap-2 text-sm sm:text-base">
-                {myMatches.map((reg) => (
-                  <span key={reg} className="bg-white border px-2 py-1 rounded-lg shadow">
-                    {reg}
-                  </span>
-                ))}
-              </span>
+          {/* Right Column - Main Form */}
+          <div className="bg-white/90 backdrop-blur-sm shadow-2xl rounded-3xl p-8 border border-pink-100">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                Add Your Crush
+              </h2>
+              <p className="text-gray-600">Keep it secret, make it special ✨</p>
             </div>
-          )}
 
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-3 sm:space-y-4 flex flex-col gap-2 sm:gap-3"
-            autoComplete="off"
-          >
-            <div className="flex flex-col gap-3 sm:gap-4">
-              {crushes.map((value, i) => (
-                <div key={i} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                  <input
-                    type="text"
-                    value={value}
-                    onChange={(e) => handleChange(i, e.target.value)}
-                    className="flex-1 px-4 py-2 sm:py-3 border-2 border-pink-200 focus:border-pink-400 transition shadow-sm bg-pink-50 rounded-xl sm:rounded-2xl text-base sm:text-lg font-medium focus:outline-none focus:ring ring-pink-100"
-                    placeholder={`Crush ${i + 1} registration number (e.g., 22bce1234)`}
-                    maxLength={20}
-                  />
-                  {crushes.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeField(i)}
-                      className="w-full sm:w-auto sm:px-3 py-2 sm:py-3 bg-red-500 text-white rounded-xl sm:rounded-2xl hover:bg-red-600 transition shadow hover:scale-105 active:scale-95"
-                      aria-label="Remove"
-                      title="Remove this field"
-                    >
-                      <span className="text-base sm:text-lg">✕</span>
-                    </button>
-                  )}
+            {/* Current Crushes */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-pink-700">Your Crushes</h3>
+                <div className="bg-pink-100 px-3 py-1 rounded-full">
+                  <span className="text-sm font-semibold text-pink-700">{myCrushes.length}/5</span>
                 </div>
-              ))}
-            </div>
-            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2">
-              {crushes.length < 5 ? (
-                <button
-                  type="button"
-                  onClick={addField}
-                  className="text-pink-700 hover:text-pink-600 font-semibold px-2 py-1 rounded-lg border border-pink-200 bg-pink-50/75 shadow hover:bg-pink-100 transition w-full sm:w-auto"
-                >
-                  + Add another crush
-                </button>
+              </div>
+              
+              {myCrushes.length === 0 ? (
+                <div className="text-center py-8 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                  <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg width={24} height={24} fill="gray" viewBox="0 0 16 16">
+                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                      <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                  </div>
+                  <p className="text-gray-500">No crushes added yet</p>
+                </div>
               ) : (
-                <span className="text-pink-400 font-semibold w-full sm:w-auto text-center">Max 5 reached</span>
+                <div className="space-y-3 max-h-64 overflow-y-auto">
+                  {myCrushes.map((crush, index) => (
+                    <div key={index} className="flex items-center justify-between bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-200 p-4 rounded-xl shadow-sm group hover:shadow-md transition-all duration-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                          {crush.name ? crush.name.charAt(0).toUpperCase() : "?"}
+                        </div>
+                        <div>
+                          <span className="font-semibold text-gray-800 block">
+                            {crush.name || "Unknown"}
+                          </span>
+                          <span className="text-sm text-gray-500">{crush.regNo}</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteCrush(crush.regNo)}
+                        className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+                      >
+                        <svg width={16} height={16} fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
               )}
-              <span className="text-xs text-gray-400 text-center sm:text-left">
-                {crushes.length} / 5 fields
-              </span>
             </div>
-            <button
-              type="submit"
-              className="w-full bg-pink-600 shadow-lg hover:bg-pink-700 active:scale-95 transition text-white py-3 rounded-2xl font-semibold text-base sm:text-lg tracking-wide border-2 border-pink-500 ring-1 ring-transparent hover:ring-pink-400 focus:outline-none"
-            >
-              Submit My Crushes 💘
-            </button>
-          </form>
 
-          {message && (
-            <div
-              className={`mt-4 sm:mt-6 mx-auto w-full max-w-full sm:max-w-lg p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow font-bold text-center text-sm sm:text-md
-                ${
-                  message.includes("🎉")
-                    ? "bg-green-100 text-green-700 border border-green-200"
-                    : message.includes("wrong")
-                    ? "bg-red-100 text-red-700 border border-red-200"
-                    : "bg-blue-100 text-pink-700 border border-pink-200"
-                }
-              `}
-            >
-              {message}
-            </div>
-          )}
+            {/* Add New Crush Form */}
+            <form onSubmit={handleAddCrush} className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Registration Number *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={crushRegNo}
+                      onChange={(e) => setCrushRegNo(e.target.value)}
+                      className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-pink-400 transition-all duration-200 bg-gray-50/50"
+                      placeholder="e.g., 22BCE1234"
+                      required
+                    />
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                      <svg width={16} height={16} fill="gray" viewBox="0 0 16 16">
+                        <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Name (Optional)
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={crushName}
+                      onChange={(e) => setCrushName(e.target.value)}
+                      className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-pink-400 transition-all duration-200 bg-gray-50/50"
+                      placeholder="e.g., Sai pallavi"
+                    />
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                      <svg width={16} height={16} fill="gray" viewBox="0 0 16 16">
+                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748z"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={myCrushes.length >= 5}
+                className={`w-full py-4 px-6 rounded-xl font-semibold text-lg shadow-lg transition-all duration-300 transform ${
+                  myCrushes.length >= 5
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white hover:scale-105 hover:shadow-xl active:scale-95"
+                }`}
+              >
+                {myCrushes.length >= 5 ? "Max 5 Crushes Reached" : "Add Crush 💕"}
+              </button>
+            </form>
+
+            {/* Messages */}
+            {message && (
+              <div className={`mt-6 p-4 rounded-xl text-center font-medium shadow-sm border-2 transition-all duration-300 ${
+                message.includes("🎉") 
+                  ? "bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-green-200" 
+                  : message.includes("Failed") 
+                  ? "bg-gradient-to-r from-red-50 to-rose-50 text-red-700 border-red-200" 
+                  : "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border-blue-200"
+              }`}>
+                {message}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
