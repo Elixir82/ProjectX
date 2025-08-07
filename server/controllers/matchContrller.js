@@ -1,5 +1,4 @@
 const userModel = require('../models/User.Model.js');
-const userModel = require('../models/User.Model');
 
 const addCrush = async (req, res) => {
   try {
