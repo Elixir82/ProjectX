@@ -1,10 +1,10 @@
 const express=require('express');
 const router=express.Router();
-const { postRant, getRants,frcounts, testfr}=require('../controllers/rantController.js');
+const { postRant, getRants,frcounts, frdeletecounts}=require('../controllers/rantController.js');
 
 router.post('/',postRant);
 router.get('/',getRants);
-router.get('/:id',frcounts);
-router.get('/test',testfr);
+router.put('/:id',frcounts);
+router.delete('/:id',frdeletecounts);
 module.exports=router;
 

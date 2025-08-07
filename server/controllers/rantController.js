@@ -32,10 +32,13 @@ const getRants = async (req, res) => {
 const frcounts = async (req, res) => {
   const { id } = req.params;
   try {
-    const resp = await rantModel.findById(id);
+    const resp = await rantModel.findByIdAndUpdate(
+      id,
+      { $inc: { forRealCount: 1 } },
+      { new: true }
+    );
+
     if (resp) {
-      resp.forRealCount = (resp.forRealCount || 0) + 1;
-      await resp.save();
       return res.status(200).json({ message: "Up voted", count: resp.forRealCount });
     } else {
       return res.status(404).json({ message: "Could not find the rant with id" });
@@ -46,8 +49,22 @@ const frcounts = async (req, res) => {
   }
 };
 
-const testfr=(req,res)=>{
-  res.status(200).json({message: "Test passed"});
-}
-
-module.exports = { postRant, getRants, frcounts, testfr};
+const frdeletecounts = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const resp = await rantModel.findById(id);
+    if (resp) {
+      // Prevent negative counts
+      const newCount = Math.max((resp.forRealCount || 0) - 1, 0);
+      resp.forRealCount = newCount;
+      await resp.save();
+      return res.status(200).json({ message: "Down voted", count: resp.forRealCount });
+    } else {
+      return res.status(404).json({ message: "Could not find the rant with id" });
+    }
+  } catch (error) {
+    console.error("Error updating forRealCount:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+module.exports = { postRant, getRants, frcounts, frdeletecounts };
