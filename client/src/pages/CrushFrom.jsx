@@ -101,7 +101,7 @@ const CrushForm = () => {
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-red-50 font-inter">
       <Navbar />
 
-      <div className="max-w-4xl mx-auto px-4 py-10">
+      <div className="max-w-5xl mx-auto px-4 py-10">
         {/* Header Section */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-3 mb-4">
@@ -115,8 +115,58 @@ const CrushForm = () => {
             </h1>
           </div>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Connect with your secret crushes and discover mutual connections
+            Connect with your secret crushes and discover mutual connections at VITAP
           </p>
+        </div>
+
+        {/* How It Works Section */}
+        <div className="bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl p-8 mb-10 border border-purple-100">
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full flex items-center justify-center">
+                <svg width={20} height={20} fill="white" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-800">How It Works</h2>
+            </div>
+            <p className="text-gray-600">Your complete guide to finding matches</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="text-center group">
+              <div className="w-16 h-16 bg-gradient-to-r from-pink-100 to-rose-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <span className="text-2xl font-bold text-pink-600">1</span>
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">Add Your Crush</h3>
+              <p className="text-sm text-gray-600">Enter their registration number and optional name. You can add up to 5 crushes at a time.</p>
+            </div>
+
+            <div className="text-center group">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <span className="text-2xl font-bold text-blue-600">2</span>
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">Wait for Magic</h3>
+              <p className="text-sm text-gray-600">If they add you as their crush too, you'll get an instant match notification!</p>
+            </div>
+
+            <div className="text-center group">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <span className="text-2xl font-bold text-green-600">3</span>
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">Manage Crushes</h3>
+              <p className="text-sm text-gray-600">Hover over crushes (or tap on mobile) to delete them. Matches can't be deleted.</p>
+            </div>
+
+            <div className="text-center group">
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-100 to-violet-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition-transform">
+                <span className="text-2xl font-bold text-purple-600">4</span>
+              </div>
+              <h3 className="font-semibold text-gray-800 mb-2">See Your Popularity</h3>
+              <p className="text-sm text-gray-600">Check how many people have secretly added you as their crush!</p>
+            </div>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
@@ -132,6 +182,9 @@ const CrushForm = () => {
                 <p className="text-gray-600">
                   <span className="font-semibold text-pink-600">{crushCount}</span> people have you as their crush
                 </p>
+                <div className="mt-3 text-xs text-gray-500 bg-pink-50 px-3 py-1 rounded-full inline-block">
+                  💡 This number updates when someone adds you
+                </div>
               </div>
             </div>
 
@@ -145,6 +198,9 @@ const CrushForm = () => {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold text-green-700">🎉 Your Matches</h3>
+                </div>
+                <div className="text-xs text-green-600 mb-3 bg-green-50 px-3 py-1 rounded-full inline-block">
+                  ⚠️ Matches cannot be deleted
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {myMatches.map(regNo => (
@@ -183,34 +239,41 @@ const CrushForm = () => {
                       <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                     </svg>
                   </div>
-                  <p className="text-gray-500">No crushes added yet</p>
+                  <p className="text-gray-500 mb-2">No crushes added yet</p>
+                  <p className="text-xs text-gray-400">Start by adding someone below!</p>
                 </div>
               ) : (
-                <div className="space-y-3 max-h-64 overflow-y-auto">
-                  {myCrushes.map((crush, index) => (
-                    <div key={index} className="flex items-center justify-between bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-200 p-4 rounded-xl shadow-sm group hover:shadow-md transition-all duration-200">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                          {crush.name ? crush.name.charAt(0).toUpperCase() : "?"}
+                <>
+                  <div className="text-xs text-pink-600 mb-3 bg-pink-50 px-3 py-1 rounded-full inline-block">
+                    💡 Hover to delete (tap on mobile)
+                  </div>
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {myCrushes.map((crush, index) => (
+                      <div key={index} className="flex items-center justify-between bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-200 p-4 rounded-xl shadow-sm group hover:shadow-md transition-all duration-200">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                            {crush.name ? crush.name.charAt(0).toUpperCase() : "?"}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-gray-800 block">
+                              {crush.name || "Unknown"}
+                            </span>
+                            <span className="text-sm text-gray-500">{crush.regNo}</span>
+                          </div>
                         </div>
-                        <div>
-                          <span className="font-semibold text-gray-800 block">
-                            {crush.name || "Unknown"}
-                          </span>
-                          <span className="text-sm text-gray-500">{crush.regNo}</span>
-                        </div>
+                        <button
+                          onClick={() => handleDeleteCrush(crush.regNo)}
+                          className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100 md:opacity-100"
+                          title="Delete crush"
+                        >
+                          <svg width={16} height={16} fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                          </svg>
+                        </button>
                       </div>
-                      <button
-                        onClick={() => handleDeleteCrush(crush.regNo)}
-                        className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
-                      >
-                        <svg width={16} height={16} fill="currentColor" viewBox="0 0 16 16">
-                          <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
 
