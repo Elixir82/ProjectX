@@ -311,7 +311,7 @@ const CrushForm = () => {
                       value={crushName}
                       onChange={(e) => setCrushName(e.target.value)}
                       className="w-full px-4 py-3 pl-12 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-pink-400 transition-all duration-200 bg-gray-50/50"
-                      placeholder="e.g., Sai pallavi"
+                      placeholder="e.g., Aman Jadon"
                     />
                     <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
                       <svg width={16} height={16} fill="gray" viewBox="0 0 16 16">
