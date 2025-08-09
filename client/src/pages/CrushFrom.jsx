@@ -72,7 +72,7 @@ const CrushForm = () => {
         setMyCrushes(prev => [...prev, { regNo: crushRegNo, name: crushName }]);
       }
 
-      // Clear form
+    
       setCrushRegNo("");
       setCrushName("");
 
