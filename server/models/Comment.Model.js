@@ -16,7 +16,7 @@ const commentSchema = new mongoose.Schema({
   parentPostType: {
     type: String,
     required: true,
-    enum: ['Rant', 'Confession']
+    enum: ['rant', 'confession']
   },
   // For replies (null if top-level)
   parentCommentId: {
