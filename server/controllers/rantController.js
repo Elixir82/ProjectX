@@ -1,5 +1,5 @@
 const rantModel = require('../models/Rant.Model.js');
-
+const commentModel = require('../models/Comment.Model.js');
 const postRant = async (req, res) => {
   const { rant } = req.body;
   if (!rant) {
@@ -22,7 +22,27 @@ const postRant = async (req, res) => {
 const getRants = async (req, res) => {
   try {
     const rants = await rantModel.find({}).sort({ createdAt: -1 });
-    return res.status(200).json({ message: "Rants fetched", rants });
+    
+    // Add comment counts to each rant
+    const rantsWithCounts = await Promise.all(
+      rants.map(async (rant) => {
+        const commentCount = await commentModel.countDocuments({
+          parentPostId: rant._id,
+          parentPostType: 'rant',
+          depth: 0  
+        });
+        
+        return {
+          ...rant.toObject(),
+          commentCount: commentCount
+        };
+      })
+    );
+
+    return res.status(200).json({ 
+      message: "Rants fetched", 
+      rants: rantsWithCounts 
+    });
   } catch (error) {
     console.error("Get Rant Error:", error.message);
     return res.status(500).json({ message: "Failed to fetch rants" });
@@ -54,7 +74,6 @@ const frdeletecounts = async (req, res) => {
   try {
     const resp = await rantModel.findById(id);
     if (resp) {
-      // Prevent negative counts
       const newCount = Math.max((resp.forRealCount || 0) - 1, 0);
       resp.forRealCount = newCount;
       await resp.save();

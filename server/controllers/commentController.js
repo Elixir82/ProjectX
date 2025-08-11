@@ -118,4 +118,38 @@ const createComment = async (req, res) => {
 }
 };
 
-module.exports ={getTopComments, getCommentReplies, createComment}
+const getReplyCount = async (req, res) => {
+  const { parentPostId, parentPostType } = req.query;
+  
+  // Validation
+  if (!parentPostId || !parentPostType) {
+    return res.status(400).json({ 
+      message: "parentPostId and parentPostType are required", 
+      count: 0 
+    });
+  }
+
+  try {
+    // Count only top-level comments (depth: 0) for the post
+    const count = await commentModel.countDocuments({
+      parentPostId: parentPostId,
+      parentPostType: parentPostType,
+      depth: 0  
+    });
+
+    res.status(200).json({
+      message: "Comment count retrieved successfully", 
+      count: count
+    });
+
+  } catch (error) {
+    console.error("Error while counting comments:", error);
+    res.status(500).json({
+      message: "Internal server error while counting comments", 
+      count: 0
+    });
+  }
+};
+
+
+module.exports ={getTopComments, getCommentReplies, createComment, getReplyCount}
