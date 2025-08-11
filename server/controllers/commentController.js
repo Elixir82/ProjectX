@@ -38,7 +38,7 @@ const getTopComments = async (req, res) => {
         _id: parentPost._id,
         content: postType === 'rant' ? parentPost.rant : parentPost.confession
       },
-      comments: topComments  // Fixed key name (was 'comment')
+      comments: topComments  
     });
 
   } catch (error) {
@@ -78,21 +78,20 @@ const createComment = async (req, res) => {
   }
 
   try {
-    // Calculate depth (0 for top-level, parentDepth + 1 for replies)
     let depth = 0;
     if (parentCommentId) {
-      const parentComment = await Comment.findById(parentCommentId);
+      const parentComment = await commentModel.findById(parentCommentId);
       if (!parentComment) {
         return res.status(404).json({ message: "Parent comment not found" });
       }
       depth = parentComment.depth + 1;
-      if (depth > 2) { // Enforce 2-level max
+      if (depth > 2) { 
         return res.status(400).json({ message: "Cannot nest replies beyond 2 levels" });
       }
     }
 
     // Create comment
-    const newComment = await Comment.create({
+    const newComment = await commentModel.create({
       content,
       parentPostId,
       parentPostType,
@@ -103,7 +102,7 @@ const createComment = async (req, res) => {
 
     // Update parentComment's replyCount (if not top-level)
     if (parentCommentId) {
-      await Comment.findByIdAndUpdate(parentCommentId, {
+      await commentModel.findByIdAndUpdate(parentCommentId, {
         $inc: { replyCount: 1 }
       });
     }
@@ -114,12 +113,9 @@ const createComment = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error creating comment:", error);
-    res.status(500).json({
-      message: "Internal server error",
-      error: process.env.NODE_ENV === 'development' ? error.message : null
-    });
-  }
+  console.error("Comment creation failed:", error.message);
+  res.status(500).json({ message: "Internal server error" });
+}
 };
 
 module.exports ={getTopComments, getCommentReplies, createComment}
