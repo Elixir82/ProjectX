@@ -5,6 +5,7 @@ import CrushForm from './pages/CrushFrom.jsx';
 import ConfessPage from './pages/Confessions.jsx';
 import RantPage from './pages/Rants.jsx';
 import PrivateRoute from './PrivateRoute.jsx';
+import CommentsPage from './pages/CommentsPage.jsx';
 import { AuthProvider } from './AuthContext.jsx';
 
 function App() {
@@ -16,7 +17,7 @@ function App() {
           <Route path="/" element={<ConfessPage />} />
           <Route path="/confessions" element={<ConfessPage />} />
           <Route path="/rants" element={<RantPage />} />
-
+          <Route path="/comments/:postType/:postId" element={<CommentsPage />}/>
           {/* Login and OTP Verify accessible by link/button */}
           <Route path="/login" element={<Login />} />
           <Route path="/verify" element={<OTPVerify />} />
