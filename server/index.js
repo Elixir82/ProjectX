@@ -18,7 +18,7 @@ app.use('/confess',confessRoutes);
 app.use('/rant',rantRoutes);
 app.use('/comment',commentRoutes);
 DBconnect();
-cronJob();
+// cronJob();
 app.listen(process.env.PORT||5000,()=>{
   console.log(`Sever is listening on ${process.env.PORT}`||'5000');
 })

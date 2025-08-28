@@ -9,6 +9,8 @@ const ConfessPage = () => {
   const [confessions, setConfessions] = useState([]);
   const [newConfession, setNewConfession] = useState('');
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState('');
   const location = useLocation();
   const { isAuthenticated } = useAuth();
@@ -21,12 +23,34 @@ const ConfessPage = () => {
   }, []);
 
   const fetchConfessions = async () => {
+    let intervalId;
+
+    const startLoader = () => {
+      setProgress(0);
+      intervalId = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 85) {
+            return prev;
+          }
+          return prev + Math.floor(Math.random() * 6 + 1);
+        });
+      }, 4000);
+    };
+
     try {
-      // console.log("Let's see if this works");
+      setInitialLoading(true);
+      startLoader();
+      
       const response = await axios.get('https://projectx-vbmj.onrender.com/confess');
       setConfessions(response.data.confessions);
     } catch (error) {
       console.error('Error fetching confessions:', error);
+    } finally {
+      clearInterval(intervalId);
+      setProgress(100);
+      setTimeout(() => {
+        setInitialLoading(false);
+      }, 400);
     }
   };
 
@@ -53,6 +77,78 @@ const ConfessPage = () => {
     }
   };
 
+  // Loading Component
+  const ConfessionsLoader = () => (
+    <div className="flex flex-col items-center justify-center py-16 sm:py-24">
+      {/* Modern loader with glassmorphism */}
+      <div className="bg-white/20 backdrop-blur-lg rounded-3xl p-8 sm:p-12 border border-white/30 shadow-2xl">
+        {/* Circular progress */}
+        <div className="relative w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-6 sm:mb-8">
+          <svg className="w-24 h-24 sm:w-32 sm:h-32 transform -rotate-90" viewBox="0 0 144 144">
+            <circle
+              cx="72"
+              cy="72"
+              r="64"
+              stroke="currentColor"
+              strokeWidth="8"
+              fill="none"
+              className="text-gray-200"
+            />
+            <circle
+              cx="72"
+              cy="72"
+              r="64"
+              stroke="currentColor"
+              strokeWidth="8"
+              fill="none"
+              strokeDasharray={`${2 * Math.PI * 64}`}
+              strokeDashoffset={`${2 * Math.PI * 64 * (1 - progress / 100)}`}
+              className="text-pink-500 transition-all duration-500 ease-out"
+              strokeLinecap="round"
+            />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
+              {progress}%
+            </span>
+          </div>
+        </div>
+
+        {/* Floating hearts animation */}
+        <div className="relative flex justify-center mb-6 sm:mb-8">
+          <div className="flex space-x-2 sm:space-x-3">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full animate-bounce"
+                style={{ 
+                  animationDelay: `${i * 0.3}s`, 
+                  animationDuration: '1.6s',
+                  clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'
+                }}
+              ></div>
+            ))}
+          </div>
+        </div>
+
+        {/* Status message */}
+        <div className="text-center">
+          <p className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">
+            {progress < 20 ? "Starting Backend..." :
+              progress < 45 ? "Fetching Confessions..." :
+                progress < 70 ? "Rendering..." :
+                  progress < 90 ? "✨ Almost ready to share..." :
+                    "💕 Ready for your story!"}
+          </p>
+          <p className="text-sm sm:text-base text-gray-500">
+            {progress < 50 ? "Warming up the confession booth" :
+              "Gathering anonymous stories from the community"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-tr from-pink-50 via-pink-100 to-pink-200 font-inter">
       <Navbar />
@@ -67,7 +163,7 @@ const ConfessPage = () => {
             <span className="font-semibold text-blue-900 block">
               <span className="text-indigo-800 font-bold text-sm sm:text-base tracking-tight">📢 Important Notice</span><br />
               <span className="text-xs sm:text-sm text-blue-700 leading-relaxed">
-                Further updates will roll out after 10 days or possibly after CAT exams. Until then, please <span className="bg-blue-100 px-1 py-0.5 rounded font-medium text-blue-800">refresh the page after replying to a comment, not post...comment</span>, as websockets aren't there so real-time updates aren’t available yet.
+                Further updates will roll out after 10 days or possibly after CAT exams. Until then, please <span className="bg-blue-100 px-1 py-0.5 rounded font-medium text-blue-800">refresh the page after replying to a comment, not post...comment</span>, as websockets aren't there so real-time updates aren't available yet.
                 <br />
                 Your feedback matters! If you have any suggestions, please share them on <a href="https://www.reddit.com/r/vitap/comments/1ml06e1/a_website_i_created/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">this Reddit post</a>.
               </span>
@@ -75,7 +171,6 @@ const ConfessPage = () => {
           </div>
         </div>
       </div>
-
 
       {!isAuthenticated && (
         <div className="max-w-xl mx-auto mt-4 sm:mt-8 mb-4 sm:mb-6 px-3 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-yellow-100 to-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow">
@@ -134,7 +229,7 @@ const ConfessPage = () => {
             />
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-3 gap-2 sm:gap-0">
               <span className="text-xs sm:text-sm text-gray-400 select-none order-2 sm:order-1">
-                {1000 - newConfession.length} characters left
+                {500 - newConfession.length} characters left
               </span>
               <button
                 type="submit"
@@ -164,9 +259,18 @@ const ConfessPage = () => {
           <h3 className="text-xl sm:text-2xl font-bold text-pink-700 mb-4 sm:mb-6 tracking-tight text-center">
             Recent Confessions
           </h3>
-          {confessions.length === 0 ? (
+          
+          {initialLoading ? (
+            <ConfessionsLoader />
+          ) : confessions.length === 0 ? (
             <div className="bg-white rounded-2xl shadow-lg py-12 sm:py-16 px-6 sm:px-8 text-center">
-              <p className="text-gray-400 text-sm sm:text-base">No confessions yet. Be the first to share!</p>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-pink-100 to-rose-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <svg className="w-8 h-8 sm:w-10 sm:h-10 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </div>
+              <h4 className="text-lg sm:text-xl font-bold text-gray-700 mb-2">No confessions yet</h4>
+              <p className="text-gray-400 text-sm sm:text-base">Be the first to share and open your heart!</p>
             </div>
           ) : (
             <div className="flex flex-col gap-4 sm:gap-6">

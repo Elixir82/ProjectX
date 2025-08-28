@@ -8,6 +8,8 @@ const RantPage = () => {
   const [rants, setRants] = useState([]);
   const [newRant, setNewRant] = useState('');
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState('');
   const location = useLocation();
   const { isAuthenticated } = useAuth();
@@ -50,11 +52,34 @@ const RantPage = () => {
   };
 
   const fetchRants = async () => {
+    let intervalId;
+
+    const startLoader = () => {
+      setProgress(0);
+      intervalId = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 85) {
+            return prev;
+          }
+          return prev + Math.floor(Math.random() * 6 + 1);
+        });
+      }, 4000);
+    };
+
     try {
+      setInitialLoading(true);
+      startLoader();
+      
       const response = await axios.get('https://projectx-vbmj.onrender.com/rant');
       setRants(response.data.rants);
     } catch (error) {
       console.error('Error fetching rants:', error);
+    } finally {
+      clearInterval(intervalId);
+      setProgress(100);
+      setTimeout(() => {
+        setInitialLoading(false);
+      }, 500);
     }
   };
 
@@ -81,6 +106,74 @@ const RantPage = () => {
     }
   };
 
+  // Loading Component
+  const RantsLoader = () => (
+    <div className="flex flex-col items-center justify-center py-16 sm:py-24">
+      {/* Modern loader with glassmorphism */}
+      <div className="bg-white/20 backdrop-blur-lg rounded-3xl p-8 sm:p-12 border border-white/30 shadow-2xl">
+        {/* Circular progress */}
+        <div className="relative w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-6 sm:mb-8">
+          <svg className="w-24 h-24 sm:w-32 sm:h-32 transform -rotate-90" viewBox="0 0 144 144">
+            <circle
+              cx="72"
+              cy="72"
+              r="64"
+              stroke="currentColor"
+              strokeWidth="8"
+              fill="none"
+              className="text-gray-200"
+            />
+            <circle
+              cx="72"
+              cy="72"
+              r="64"
+              stroke="currentColor"
+              strokeWidth="8"
+              fill="none"
+              strokeDasharray={`${2 * Math.PI * 64}`}
+              strokeDashoffset={`${2 * Math.PI * 64 * (1 - progress / 100)}`}
+              className="text-red-500 transition-all duration-500 ease-out"
+              strokeLinecap="round"
+            />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
+              {progress}%
+            </span>
+          </div>
+        </div>
+
+        {/* Floating dots animation */}
+        <div className="relative flex justify-center mb-6 sm:mb-8">
+          <div className="flex space-x-2 sm:space-x-3">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-red-500 to-rose-500 rounded-full animate-bounce"
+                style={{ animationDelay: `${i * 0.2}s`, animationDuration: '1.4s' }}
+              ></div>
+            ))}
+          </div>
+        </div>
+
+        {/* Status message */}
+        <div className="text-center">
+          <p className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">
+            {progress < 20 ? "Starting Backend..." :
+              progress < 45 ? "Fetching Rants..." :
+                progress < 70 ? "Rendering..." :
+                  progress < 90 ? "✨ Almost ready to share..." :
+                    "💕 Ready for your story!"}
+          </p>
+          <p className="text-sm sm:text-base text-gray-500">
+            {progress < 50 ? "Our server is starting up from cold storage" :
+              "Fetching the latest community rants"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-tr from-red-50 via-red-100 to-pink-100 font-inter">
       <Navbar />
@@ -95,7 +188,7 @@ const RantPage = () => {
             <span className="font-semibold text-blue-900 block">
               <span className="text-indigo-800 font-bold text-sm sm:text-base tracking-tight">📢 Important Notice</span><br />
               <span className="text-xs sm:text-sm text-blue-700 leading-relaxed">
-                Further updates will roll out after 10 days or possibly after CAT exams. Until then, please <span className="bg-blue-100 px-1 py-0.5 rounded font-medium text-blue-800">refresh the page after replying to a comment, not post...comment</span>, as websockets aren't there so real-time updates aren’t available yet.
+                Further updates will roll out after 10 days or possibly after CAT exams. Until then, please <span className="bg-blue-100 px-1 py-0.5 rounded font-medium text-blue-800">refresh the page after replying to a comment, not post...comment</span>, as websockets aren't there so real-time updates aren't available yet.
                 <br />
                 Your feedback matters! If you have any suggestions, please share them on <a href="https://www.reddit.com/r/vitap/comments/1ml06e1/a_website_i_created/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">this Reddit post</a>.
               </span>
@@ -103,7 +196,6 @@ const RantPage = () => {
           </div>
         </div>
       </div>
-
 
       {!isAuthenticated && (
         <div className="max-w-xl mx-auto mt-4 sm:mt-8 mb-4 sm:mb-6 px-3 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-yellow-100 to-yellow-50 border-l-4 border-yellow-400 rounded-xl shadow">
@@ -162,7 +254,7 @@ const RantPage = () => {
             />
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-3 gap-2 sm:gap-0">
               <span className="text-xs sm:text-sm text-gray-400 select-none order-2 sm:order-1">
-                {1000 - newRant.length} characters left
+                {500 - newRant.length} characters left
               </span>
               <button
                 type="submit"
@@ -192,9 +284,18 @@ const RantPage = () => {
           <h3 className="text-xl sm:text-2xl font-bold text-rose-700 mb-4 sm:mb-6 tracking-tight text-center">
             Recent Rants
           </h3>
-          {rants.length === 0 ? (
+          
+          {initialLoading ? (
+            <RantsLoader />
+          ) : rants.length === 0 ? (
             <div className="bg-white rounded-2xl shadow-lg py-12 sm:py-16 px-6 sm:px-8 text-center">
-              <p className="text-gray-400 text-sm sm:text-base">No rants yet. Be the first to vent!</p>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-red-100 to-rose-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <svg className="w-8 h-8 sm:w-10 sm:h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10m0 0V6a2 2 0 00-2-2H9a2 2 0 00-2 2v2m0 0v10a2 2 0 002 2h10a2 2 0 002-2V8M9 12h6m-6 4h6" />
+                </svg>
+              </div>
+              <h4 className="text-lg sm:text-xl font-bold text-gray-700 mb-2">No rants yet</h4>
+              <p className="text-gray-400 text-sm sm:text-base">Be the first to vent and share what's on your mind!</p>
             </div>
           ) : (
             <div className="flex flex-col gap-4 sm:gap-6">
@@ -211,7 +312,6 @@ const RantPage = () => {
                   </div>
 
                   {/* Metadata and actions - Responsive */}
-                  {/* Metadata and actions - Responsive */}
                   <div className="flex items-center justify-between gap-2 sm:gap-0">
                     <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500">
                       {/* Anonymous tag - hidden on small screens, visible on larger screens */}
@@ -221,11 +321,9 @@ const RantPage = () => {
                       </div>
                       <span className="text-gray-400 hidden sm:inline">•</span>
                       <span className="text-xs sm:text-sm flex-shrink-0">{new Date(rant.createdAt).toLocaleString()}</span>
-
                     </div>
 
                     <div className="flex items-center gap-1 sm:gap-4">
-
                       {/* Comments button - Responsive */}
                       <button
                         onClick={() => navigate(`/comments/rant/${rant._id}`)}
