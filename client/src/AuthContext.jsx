@@ -16,7 +16,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Check if user is authenticated on app load
   useEffect(() => {
     checkAuthStatus();
   }, []);
@@ -42,7 +41,6 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Token verification failed:', error);
-      // If token is invalid, remove it
       localStorage.removeItem('token');
       setUser(null);
       setIsAuthenticated(false);

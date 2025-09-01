@@ -84,7 +84,6 @@ const deleteCrush = async (req, res) => {
 const getCrushCount = async (req, res) => {
   try {
     const { regNo } = req.params;
-    // Find how many users have this regNo in their crushes array
     const count = await userModel.countDocuments({ 
       "crushes.regNo": regNo 
     });

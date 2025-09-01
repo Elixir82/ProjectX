@@ -22,8 +22,7 @@ const postRant = async (req, res) => {
 const getRants = async (req, res) => {
   try {
     const rants = await rantModel.find({}).sort({ createdAt: -1 });
-    
-    // Add comment counts to each rant
+  
     const rantsWithCounts = await Promise.all(
       rants.map(async (rant) => {
         const commentCount = await commentModel.countDocuments({

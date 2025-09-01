@@ -37,12 +37,10 @@ const Navbar = () => {
     setMenuOpen(false);
   };
 
-  // Auto-close mobile menu on nav
   React.useEffect(() => {
     setMenuOpen(false);
   }, [location.pathname]);
 
-  // Utility for active link highlighting
   const isActive = (to, startsWith = false) =>
     startsWith
       ? location.pathname.startsWith(to)

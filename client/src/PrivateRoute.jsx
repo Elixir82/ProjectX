@@ -5,7 +5,6 @@ import { useAuth } from './AuthContext.jsx';
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
-  // Show loading spinner while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-pink-50">
@@ -17,12 +16,10 @@ const PrivateRoute = ({ children }) => {
     );
   }
 
-  // If not authenticated, redirect to login
   if (!isAuthenticated) {
     return <Navigate to="/" replace />;
   }
 
-  // If authenticated, render the protected component
   return children;
 };
 

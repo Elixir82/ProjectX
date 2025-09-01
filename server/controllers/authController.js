@@ -123,7 +123,6 @@ let verifyOTP = async (req, res) => {
   }
 };
 
-// Add this new function
 let verifyToken = async (req, res) => {
   try {
     // If middleware passes, token is valid

@@ -5,13 +5,11 @@ const commentModel = require('../models/Comment.Model.js');
 const getTopComments = async (req, res) => {
   const { postType, postId } = req.query;
 
-  // Validate input
   if (!postType || !postId) {
     return res.status(400).json({ message: "postType and postId are required" });
   }
 
   try {
-    // Common query for both rants/confessions
     let parentPost;
     if (postType === 'rant') {
       parentPost = await rantModel.findById(postId);
@@ -25,12 +23,11 @@ const getTopComments = async (req, res) => {
       return res.status(404).json({ message: `${postType} not found` });
     }
 
-    // Fetch ONLY top-level comments (depth=0)
     const topComments = await commentModel.find({
       parentPostId: postId,
       parentPostType: postType,
-      depth: 0  // Critical for hybrid comments
-    }).sort({ createdAt: -1 });  // Newest first
+      depth: 0 
+    }).sort({ createdAt: -1 });
 
     return res.status(200).json({
       message: "Top comments retrieved",
@@ -45,7 +42,7 @@ const getTopComments = async (req, res) => {
     console.error(`Error fetching ${postType} comments:`, error);
     return res.status(500).json({
       message: "Internal server error",
-      error: error.message  // Helpful for debugging
+      error: error.message 
     });
   }
 };
@@ -72,7 +69,6 @@ const getCommentReplies = async (req, res) => {
 const createComment = async (req, res) => {
   const { content, parentPostId, parentPostType, parentCommentId = null } = req.body;
 
-  // Validation
   if (!content || !parentPostId || !parentPostType) {
     return res.status(400).json({ message: "content, parentPostId, and parentPostType are required" });
   }
@@ -90,7 +86,6 @@ const createComment = async (req, res) => {
       }
     }
 
-    // Create comment
     const newComment = await commentModel.create({
       content,
       parentPostId,
@@ -100,7 +95,6 @@ const createComment = async (req, res) => {
       replyCount: 0
     });
 
-    // Update parentComment's replyCount (if not top-level)
     if (parentCommentId) {
       await commentModel.findByIdAndUpdate(parentCommentId, {
         $inc: { replyCount: 1 }
@@ -120,8 +114,7 @@ const createComment = async (req, res) => {
 
 const getReplyCount = async (req, res) => {
   const { parentPostId, parentPostType } = req.query;
-  
-  // Validation
+
   if (!parentPostId || !parentPostType) {
     return res.status(400).json({ 
       message: "parentPostId and parentPostType are required", 
@@ -130,7 +123,6 @@ const getReplyCount = async (req, res) => {
   }
 
   try {
-    // Count only top-level comments (depth: 0) for the post
     const count = await commentModel.countDocuments({
       parentPostId: parentPostId,
       parentPostType: parentPostType,

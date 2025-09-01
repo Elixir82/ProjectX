@@ -13,16 +13,13 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          {/* Make Confessions page the new homepage */}
           <Route path="/" element={<ConfessPage />} />
           <Route path="/confessions" element={<ConfessPage />} />
           <Route path="/rants" element={<RantPage />} />
           <Route path="/comments/:postType/:postId" element={<CommentsPage />}/>
-          {/* Login and OTP Verify accessible by link/button */}
           <Route path="/login" element={<Login />} />
           <Route path="/verify" element={<OTPVerify />} />
 
-          {/* Crushes remain protected */}
           <Route path="/crush" element={<PrivateRoute><CrushForm /></PrivateRoute>} />
         </Routes>
       </AuthProvider>

@@ -26,8 +26,6 @@ const Confess = async (req, res) => {
 const getConfessions = async (req, res) => {
   try {
     const confessions = await confessModel.find().sort({ createdAt: -1 });
-    
-    // Add comment counts to each confession
     const confessionsWithCounts = await Promise.all(
       confessions.map(async (confession) => {
         const commentCount = await commentModel.countDocuments({
@@ -48,7 +46,7 @@ const getConfessions = async (req, res) => {
       confessions: confessionsWithCounts
     });
   } catch (error) {
-    // error handling
+    console.log(`Error in fetching confessions ${error}`);
   }
 };
 

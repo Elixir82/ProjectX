@@ -63,7 +63,7 @@ const RantPage = () => {
           }
           return prev + Math.floor(Math.random() * 6 + 1);
         });
-      }, 4000);
+      }, 3000);
     };
 
     try {
@@ -186,11 +186,11 @@ const RantPage = () => {
           </svg>
           <div>
             <span className="font-semibold text-blue-900 block">
-              <span className="text-indigo-800 font-bold text-sm sm:text-base tracking-tight">📢 Important Notice</span><br />
+              <span className="text-indigo-800 font-bold text-sm sm:text-base tracking-tight">Yo!</span><br />
               <span className="text-xs sm:text-sm text-blue-700 leading-relaxed">
-                Further updates will roll out after 10 days or possibly after CAT exams. Until then, please <span className="bg-blue-100 px-1 py-0.5 rounded font-medium text-blue-800">refresh the page after replying to a comment, not post...comment</span>, as websockets aren't there so real-time updates aren't available yet.
+                Please do share the site as adding your crush doesn't make sense if they're not aware that they can add their crush. Making confessions or ranting to public doesn't mean much if there's no public.
                 <br />
-                Your feedback matters! If you have any suggestions, please share them on <a href="https://www.reddit.com/r/vitap/comments/1ml06e1/a_website_i_created/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">this Reddit post</a>.
+                If you have any suggestions, please share them on <a href="https://www.reddit.com/r/vitap/comments/1ml06e1/a_website_i_created/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">this Reddit post</a>.
               </span>
             </span>
           </div>

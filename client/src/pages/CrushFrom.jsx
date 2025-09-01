@@ -12,28 +12,24 @@ const CrushForm = () => {
   const [myMatches, setMyMatches] = useState([]);
   const [myCrushes, setMyCrushes] = useState([]);
 
-  // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
       if (!token || !user?.regNo) return;
       
       try {
-        // Fetch crush count
         const countRes = await axios.get(
           `https://projectx-vbmj.onrender.com/match/count/${user.regNo}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setCrushCount(countRes.data.count);
 
-        // Fetch matches
         const matchesRes = await axios.get(
           "https://projectx-vbmj.onrender.com/match/my-matches",
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setMyMatches(matchesRes.data.matchedWith);
 
-        // Fetch user's crushes 
         const crushesRes = await axios.get(
           "https://projectx-vbmj.onrender.com/match/crushes",
           { headers: { Authorization: `Bearer ${token}` } }

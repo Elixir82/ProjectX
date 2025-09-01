@@ -15,7 +15,7 @@ const CommentPage = () => {
   const [expandedReplies, setExpandedReplies] = useState(new Set());
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState('');
-  const [sortBy, setSortBy] = useState('newest'); // New: sorting option
+  const [sortBy, setSortBy] = useState('newest');
 
   const { postType, postId } = useParams();
   const navigate = useNavigate();
@@ -30,7 +30,6 @@ const CommentPage = () => {
     fetchCommentsData();
   }, [postType, postId]);
 
-  // Auto-clear messages after 3 seconds
   useEffect(() => {
     if (message) {
       const timer = setTimeout(() => setMessage(''), 3000);
@@ -129,7 +128,6 @@ const CommentPage = () => {
     setExpandedReplies(newExpanded);
   };
 
-  // Sort comments based on selected option
   const sortedComments = [...comments].sort((a, b) => {
     switch (sortBy) {
       case 'oldest':
@@ -140,7 +138,6 @@ const CommentPage = () => {
     }
   });
 
-  // Format time ago
   const getTimeAgo = (date) => {
     const now = new Date();
     const commentDate = new Date(date);
