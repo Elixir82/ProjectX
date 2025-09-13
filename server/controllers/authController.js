@@ -31,7 +31,7 @@ let Signup = async (req, res) => {
     });
 
     const sendSmtpEmail = {
-      sender: { name: "RegMatch", email: "xxx09112001@gmail.com" }, 
+      sender: { name: "RegMatch", email: "timepass17281@gmail.com" }, 
       to: [{ email }],
       subject: "OTP for RegMatch",
       htmlContent: `<p>Your OTP is: <b>${otp}</b></p><p>It will expire in 5 minutes.</p>`,
