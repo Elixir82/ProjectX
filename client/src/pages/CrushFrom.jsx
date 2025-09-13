@@ -19,19 +19,19 @@ const CrushForm = () => {
       
       try {
         const countRes = await axios.get(
-          `https://projectx-vbmj.onrender.com/match/count/${user.regNo}`,
+          `https://projectx-production-7788.up.railway.app/match/count/${user.regNo}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setCrushCount(countRes.data.count);
 
         const matchesRes = await axios.get(
-          "https://projectx-vbmj.onrender.com/match/my-matches",
+          "https://projectx-production-7788.up.railway.app/match/my-matches",
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setMyMatches(matchesRes.data.matchedWith);
 
         const crushesRes = await axios.get(
-          "https://projectx-vbmj.onrender.com/match/crushes",
+          "https://projectx-production-7788.up.railway.app/match/crushes",
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setMyCrushes(crushesRes.data.crushes);
@@ -55,7 +55,7 @@ const CrushForm = () => {
 
     try {
       const res = await axios.post(
-        "https://projectx-vbmj.onrender.com/match",
+        "https://projectx-production-7788.up.railway.app/match",
         { crushRegNo, crushName },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -83,7 +83,7 @@ const CrushForm = () => {
 
     try {
       await axios.delete(
-        `https://projectx-vbmj.onrender.com/match/${regNo}`,
+        `https://projectx-production-7788.up.railway.app/match/${regNo}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMyCrushes(prev => prev.filter(c => c.regNo !== regNo));

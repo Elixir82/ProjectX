@@ -19,7 +19,7 @@ function OTPVerify() {
     setMessage('');
     
     try {
-      const res = await axios.post('https://projectx-vbmj.onrender.com/verify', {
+      const res = await axios.post('https://projectx-production-7788.up.railway.app/verify', {
         email,
         otp,
         crushData

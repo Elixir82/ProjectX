@@ -2,12 +2,16 @@ const express = require('express');
 const router = express.Router();
 const otpModel = require('../models/Otp.Model.js');
 const userModel = require('../models/User.Model.js');
-const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
+const Brevo = require('@getbrevo/brevo');
+
+const brevo = new Brevo.TransactionalEmailsApi();
+brevo.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
 
 let Signup = async (req, res) => {
   const { email } = req.body;
   console.log(email);
+
   const vitapEmailRegex = /^[a-z]+\.[a-z0-9]+@vitapstudent\.ac\.in$/i;
   if (!vitapEmailRegex.test(email)) {
     return res.status(400).json({
@@ -23,27 +27,21 @@ let Signup = async (req, res) => {
     await otpModel.create({
       email: email,
       otp: otp,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000)
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000) 
     });
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+    const sendSmtpEmail = {
+      sender: { name: "RegMatch", email: "noreply@regmatch.app" }, 
+      to: [{ email }],
+      subject: "OTP for RegMatch",
+      htmlContent: `<p>Your OTP is: <b>${otp}</b></p><p>It will expire in 5 minutes.</p>`,
+    };
 
-    await transporter.sendMail({
-      from: `"RegMatch" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: 'OTP for RegMatch',
-      html: `<p>Your OTP is: <b>${otp}</b></p><p>It will expire in 5 minutes.</p>`
-    });
+    await brevo.sendTransacEmail(sendSmtpEmail);
 
     res.status(200).json({ message: "OTP sent successfully" });
   } catch (error) {
-    console.error("Error in OTP process:", error);
+    console.error("Error in OTP process:", error.response?.body || error);
     res.status(500).json({ error: "Failed to process OTP" });
   }
 };
@@ -125,7 +123,6 @@ let verifyOTP = async (req, res) => {
 
 let verifyToken = async (req, res) => {
   try {
-    // If middleware passes, token is valid
     const user = await userModel.findOne({ email: req.user.email });
     
     if (!user) {

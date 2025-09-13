@@ -40,7 +40,7 @@ const CommentPage = () => {
   const fetchCommentsData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`https://projectx-vbmj.onrender.com/comment/top?postType=${postType}&postId=${postId}`);
+      const response = await axios.get(`https://projectx-production-7788.up.railway.app/comment/top?postType=${postType}&postId=${postId}`);
       setParentPost(response.data.parentPost);
       setComments(response.data.comments);
     } catch (error) {
@@ -53,7 +53,7 @@ const CommentPage = () => {
 
   const fetchReplies = async (commentId) => {
     try {
-      const response = await axios.get(`https://projectx-vbmj.onrender.com/comment/replies?parentCommentId=${commentId}`);
+      const response = await axios.get(`https://projectx-production-7788.up.railway.app/comment/replies?parentCommentId=${commentId}`);
       setReplies(prev => ({
         ...prev,
         [commentId]: response.data.replies
@@ -75,7 +75,7 @@ const CommentPage = () => {
     setMessage('');
 
     try {
-      await axios.post('https://projectx-vbmj.onrender.com/comment', {
+      await axios.post('https://projectx-production-7788.up.railway.app/comment', {
         content: newComment,
         parentPostId: postId,
         parentPostType: postType
@@ -96,7 +96,7 @@ const CommentPage = () => {
     if (!replyText.trim()) return;
 
     try {
-      await axios.post('https://projectx-vbmj.onrender.com/comment', {
+      await axios.post('https://projectx-production-7788.up.railway.app/comment', {
         content: replyText,
         parentPostId: postId,
         parentPostType: postType,

@@ -41,7 +41,7 @@ const ConfessPage = () => {
       setInitialLoading(true);
       startLoader();
       
-      const response = await axios.get('https://projectx-vbmj.onrender.com/confess');
+      const response = await axios.get('https://projectx-production-7788.up.railway.app/confess');
       setConfessions(response.data.confessions);
     } catch (error) {
       console.error('Error fetching confessions:', error);
@@ -63,7 +63,7 @@ const ConfessPage = () => {
     setLoading(true);
     setMessage('');
     try {
-      const response = await axios.post('https://projectx-vbmj.onrender.com/confess', {
+      const response = await axios.post('https://projectx-production-7788.up.railway.app/confess', {
         confession: newConfession
       });
       setMessage(response.data.message);

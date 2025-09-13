@@ -24,7 +24,7 @@ const RantPage = () => {
     try {
       let key = `rantKey_${rantID}`;
       let alreadyClicked = localStorage.getItem(key);
-      let url = `https://projectx-vbmj.onrender.com/rant/${rantID}`;
+      let url = `https://projectx-production-7788.up.railway.app/rant/${rantID}`;
       const method = alreadyClicked ? 'DELETE' : 'PUT';
 
       const res = await fetch(url, { method });
@@ -70,7 +70,7 @@ const RantPage = () => {
       setInitialLoading(true);
       startLoader();
       
-      const response = await axios.get('https://projectx-vbmj.onrender.com/rant');
+      const response = await axios.get('https://projectx-production-7788.up.railway.app/rant');
       setRants(response.data.rants);
     } catch (error) {
       console.error('Error fetching rants:', error);
@@ -92,7 +92,7 @@ const RantPage = () => {
     setLoading(true);
     setMessage('');
     try {
-      const response = await axios.post('https://projectx-vbmj.onrender.com/rant', {
+      const response = await axios.post('https://projectx-production-7788.up.railway.app/rant', {
         rant: newRant
       });
       setMessage(response.data.message);

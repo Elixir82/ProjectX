@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await axios.get('https://projectx-vbmj.onrender.com/verify-token', {
+      const response = await axios.get('https://projectx-production-7788.up.railway.app/verify-token', {
         headers: {
           Authorization: `Bearer ${token}`
         }
